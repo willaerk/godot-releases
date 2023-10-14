@@ -44,11 +44,13 @@ jobs:
         uses: actions/create-release@v1
         id: create_release
         with:
+          tag_name: ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
       - if: github.event.inputs.release_artifact == 'true'
         name: Upload Linux artifact
         uses: actions/upload-release-asset@v1
