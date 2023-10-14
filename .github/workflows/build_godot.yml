@@ -1,0 +1,60 @@
+on:
+  workflow_dispatch:
+    inputs:
+      godot_version:
+        description: 'Godot version'
+        required: false
+        default: ''
+      release_artifact:
+        description: 'Release artifact'
+        required: false
+        default: 'true'
+
+jobs:
+  godot:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.0
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Build artifact
+        run: bundle exec rake godot:build_artifact VERSION=${{ github.event.inputs.godot_version }}
+
+      - name: Artifact
+        run: echo "::set-output name=artifact_path::$(find . -name 'godot_*.deb')"
+        run: echo "::set-output name=artifact_path::$(basename `find . -name 'godot_*.deb'`)"
+        id: artifact
+
+      - name: Version
+        run: echo "::set-output name=version::$(pkg/opt/godot/bin/godot --version | cut -d '.' -f 1-3)"
+        id: version
+
+      - if: github.event.inputs.release_artifact == 'true'
+        name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - if: github.event.inputs.release_artifact == 'true'
+        name: Upload Linux artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.artifact.outputs.artifact_path }}
+          asset_name: ${{ steps.artifact.outputs.artifact_name }}
+          asset_content_type: application/gzip
