@@ -31,33 +31,17 @@ jobs:
 
       - name: Artifact
         run: |
-          echo "echo artifact_path=$(find . -name 'godot_*.deb')" >> $GITHUB_OUTPUT
-          echo "echo artifact_name=$(basename `find . -name 'godot_*.deb'`)" >> $GITHUB_OUTPUT
+          echo "path=$(find . -name 'godot_*.deb')" >> $GITHUB_OUTPUT
+          echo "version=$(pkg/opt/godot/bin/godot --version | cut -d '.' -f 1-3)" >> $GITHUB_OUTPUT
         id: artifact
-
-      - name: Version
-        run: echo "version=$(pkg/opt/godot/bin/godot --version | cut -d '.' -f 1-3)" >> $GITHUB_OUTPUT
-        id: version
 
       - if: github.event.inputs.release_artifact == 'true'
         name: Create release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         id: create_release
         with:
-          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.artifact.outputs.version }}
+          tag_name: ${{ steps.artifact.outputs.version }}
           draft: false
           prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - if: github.event.inputs.release_artifact == 'true'
-        name: Upload Linux artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.artifact.outputs.artifact_path }}
-          asset_name: ${{ steps.artifact.outputs.artifact_name }}
-          asset_content_type: application/gzip
+          files: ${{ steps.artifact.outputs.path }}
