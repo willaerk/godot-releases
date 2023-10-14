@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Link to the binary
+ln -sf '/opt/godot/bin/godot' '/usr/bin/godot'
+
+update-mime-database /usr/share/mime || true
+update-desktop-database /usr/share/applications || true
