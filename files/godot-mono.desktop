@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Godot Engine (C#)
+Comment=Multi-platform 2D and 3D game engine with a feature-rich editor (C# support)
+Exec=godot-mono -e
+Icon=godot-mono
+Terminal=false
+PrefersNonDefaultGPU=true
+Type=Application
+MimeType=application/x-godot-project;
+Categories=Development;IDE;
+StartupWMClass=Godot
