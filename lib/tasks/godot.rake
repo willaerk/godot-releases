@@ -52,7 +52,7 @@ namespace "#{namespace}" do
     FileUtils.cd(ROOT_DIR) {
       system("fpm -s dir -t deb -a amd64 -v #{version} -n godot --license MIT \
         --prefix / -C pkg -m 'Kristof Willaert <kristof.willaert@gmail.com>' \
-        --after-install files/postinst --after-remove files/postrm \
+        --after-install files/postinst.godot --after-remove files/postrm.godot \
         --url 'https://godotengine.org' --vendor 'Godot Foundation' \
         --description 'Full 2D and 3D game engine with editor' ."
       )
