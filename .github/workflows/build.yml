@@ -1,0 +1,89 @@
+on:
+  workflow_dispatch:
+    inputs:
+      godot_version:
+        description: 'Godot version'
+        required: false
+        default: ''
+      release_artifact:
+        description: 'Release artifact'
+        required: false
+        default: 'true'
+
+jobs:
+  godot:
+    name: Build Godot artifact
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.0
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Build artifact
+        run: bundle exec rake godot:build_artifact VERSION=${{ github.event.inputs.godot_version }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: godot
+          path: godot_*.deb
+
+  godot-mono:
+    name: Build Godot (with C# support) artifact
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.0
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Build artifact
+        run: bundle exec rake godot-mono:build_artifact VERSION=${{ github.event.inputs.godot_version }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: godot-mono
+          path: godot-mono_*.deb
+
+  release:
+    name: Create GitHub release
+    runs-on: ubuntu-20.04
+    needs: [godot, godot-mono]
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Artifacts version
+        run: |
+          echo "version=$(dpkg-deb -f artifacts/godot_*.deb Version)" >> $GITHUB_OUTPUT
+        id: artifact
+
+      - if: github.event.inputs.release_artifact == 'true'
+        name: Create release
+        uses: softprops/action-gh-release@v1
+        id: create_release
+        with:
+          name: ${{ steps.artifact.outputs.version }}
+          tag_name: ${{ steps.artifact.outputs.version }}
+          draft: false
+          prerelease: false
+          files: artifacts/godot*.deb
