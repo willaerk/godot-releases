@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Link to the binary
-ln -sf '/opt/godot/bin/godot' '/usr/bin/godot'
+set -e
+
+update-alternatives --install /usr/bin/godot godot /opt/godot/godot 5
 
 update-mime-database /usr/share/mime || true
 update-desktop-database /usr/share/applications || true

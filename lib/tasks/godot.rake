@@ -30,20 +30,22 @@ namespace "#{namespace}" do
     FileUtils.cd(ROOT_DIR) {
       FileUtils.mkdir('pkg')
       FileUtils.mkdir_p('pkg/usr/share/applications')
-      FileUtils.mkdir_p('pkg/opt/godot/bin')
+      FileUtils.mkdir_p('pkg/opt/godot')
       FileUtils.mkdir_p('pkg/usr/share/icons/hicolor')
 
-      system("unzip #{download_file} -d pkg/opt/godot/bin")
-      FileUtils.mv("pkg/opt/godot/bin/#{download_file.chomp('.zip')}", 'pkg/opt/godot/bin/godot')
-
-      #Create icons
+      # Create icons
       icon_resolutions.each { |res|
         FileUtils.mkdir_p("pkg/usr/share/icons/hicolor/#{res}x#{res}/apps")
-        system("convert files/godot.png -resize #{res}x#{res} pkg/usr/share/icons/hicolor/#{res}x#{res}/apps/godot.png")
+        system("convert files/godot/godot.png -resize #{res}x#{res} pkg/usr/share/icons/hicolor/#{res}x#{res}/apps/godot.png")
       }
 
-      #Create desktop shortcut
-      FileUtils.cp('files/godot.desktop', 'pkg/usr/share/applications')
+      # Create desktop shortcut
+      FileUtils.cp('files/godot/godot.desktop', 'pkg/usr/share/applications')
+
+      # Uncompress application
+      system("unzip #{download_file} -d pkg")
+      FileUtils.mv("pkg/#{download_file.chomp('.zip')}", 'pkg/opt/godot/godot')
+      FileUtils.rm_r("pkg/#{download_file.chomp('.zip')}", :force => true)
     }
   end
 
@@ -52,7 +54,8 @@ namespace "#{namespace}" do
     FileUtils.cd(ROOT_DIR) {
       system("fpm -s dir -t deb -a amd64 -v #{version} -n godot --license MIT \
         --prefix / -C pkg -m 'Kristof Willaert <kristof.willaert@gmail.com>' \
-        --after-install files/postinst.godot --after-remove files/postrm.godot \
+        --after-install files/godot/postinst \
+        --before-remove files/godot/prerm \
         --url 'https://godotengine.org' --vendor 'Godot Foundation' \
         --description 'Full 2D and 3D game engine with editor' ."
       )
@@ -69,4 +72,3 @@ namespace "#{namespace}" do
     }
   end
 end
-
