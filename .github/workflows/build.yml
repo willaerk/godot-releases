@@ -72,9 +72,11 @@ jobs:
         with:
           path: artifacts
 
-      - name: Artifacts version
+      - name: Artifacts version and paths
         run: |
-          echo "version=$(dpkg-deb -f artifacts/godot_*.deb Version)" >> $GITHUB_OUTPUT
+          echo "version=$(dpkg-deb -f artifacts/godot/godot_*.deb Version)" >> $GITHUB_OUTPUT
+          echo "godot_path=$(find artifacts/godot -name 'godot_*.deb')" >> $GITHUB_OUTPUT
+          echo "godot-mono_path=$(find artifacts/godot-mono -name 'godot-mono*.deb')" >> $GITHUB_OUTPUT
         id: artifact
 
       - if: github.event.inputs.release_artifact == 'true'
@@ -86,4 +88,6 @@ jobs:
           tag_name: ${{ steps.artifact.outputs.version }}
           draft: false
           prerelease: false
-          files: artifacts/godot*.deb
+          files: |
+            ${{ steps.artifact.outputs.godot_path }}
+            ${{ steps.artifact.outputs.godot-mono_path }}
