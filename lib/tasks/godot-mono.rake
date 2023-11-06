@@ -55,7 +55,7 @@ namespace "#{namespace}" do
     FileUtils.cd(ROOT_DIR) {
       system("fpm -s dir -t deb -a amd64 -v #{version} -n godot-mono --license MIT \
         --prefix / -C pkg -m 'Kristof Willaert <kristof.willaert@gmail.com>' \
-        --after-install files/godot-mono/postinst --after-remove files/godot-mono/postrm \
+        --after-install files/godot-mono/postinst \
         --before-remove files/godot-mono/prerm \
         --url 'https://godotengine.org' --vendor 'Godot Foundation' \
         --description 'Full 2D and 3D game engine with editor (with C# support)' ."
