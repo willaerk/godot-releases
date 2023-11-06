@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Link to the binary
-ln -sf '/opt/godot-mono/bin/godot' '/usr/bin/godot-mono'
+set -e
+
+update-alternatives --install /usr/bin/godot godot /opt/godot-mono/godot 10
 
 update-mime-database /usr/share/mime || true
 update-desktop-database /usr/share/applications || true

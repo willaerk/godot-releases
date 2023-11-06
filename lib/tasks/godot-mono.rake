@@ -30,20 +30,23 @@ namespace "#{namespace}" do
     FileUtils.cd(ROOT_DIR) {
       FileUtils.mkdir('pkg')
       FileUtils.mkdir_p('pkg/usr/share/applications')
-      FileUtils.mkdir_p('pkg/opt/godot-mono/bin')
+      FileUtils.mkdir_p('pkg/opt/godot-mono')
       FileUtils.mkdir_p('pkg/usr/share/icons/hicolor')
 
-      system("unzip #{download_file} -d pkg/opt/godot-mono/bin")
-      FileUtils.mv("pkg/opt/godot-mono/bin/#{download_file.chomp('.zip')}", 'pkg/opt/godot-mono/bin/godot')
-
-      #Create icons
+      # Create icons
       icon_resolutions.each { |res|
         FileUtils.mkdir_p("pkg/usr/share/icons/hicolor/#{res}x#{res}/apps")
-        system("convert files/godot-mono.png -resize #{res}x#{res} pkg/usr/share/icons/hicolor/#{res}x#{res}/apps/godot-mono.png")
+        system("convert files/godot-mono/godot-mono.png -resize #{res}x#{res} pkg/usr/share/icons/hicolor/#{res}x#{res}/apps/godot-mono.png")
       }
 
-      #Create desktop shortcut
-      FileUtils.cp('files/godot-mono.desktop', 'pkg/usr/share/applications')
+      # Create desktop shortcut
+      FileUtils.cp('files/godot-mono/godot-mono.desktop', 'pkg/usr/share/applications')
+
+      # Uncompress application
+      system("unzip #{download_file} -d pkg")
+      FileUtils.mv(Dir.glob("pkg/#{download_file.chomp('.zip')}/*"), 'pkg/opt/godot-mono')
+      FileUtils.mv(Dir.glob("pkg/opt/godot-mono/Godot_v#{version}_mono_linux*")[0], 'pkg/opt/godot-mono/godot')
+      FileUtils.rm_r("pkg/#{download_file.chomp('.zip')}", :force => true)
     }
   end
 
@@ -52,7 +55,8 @@ namespace "#{namespace}" do
     FileUtils.cd(ROOT_DIR) {
       system("fpm -s dir -t deb -a amd64 -v #{version} -n godot-mono --license MIT \
         --prefix / -C pkg -m 'Kristof Willaert <kristof.willaert@gmail.com>' \
-        --after-install files/postinst.godot-mono --after-remove files/postrm.godot-mono \
+        --after-install files/godot-mono/postinst --after-remove files/godot-mono/postrm \
+        --before-remove files/godot-mono/prerm \
         --url 'https://godotengine.org' --vendor 'Godot Foundation' \
         --description 'Full 2D and 3D game engine with editor (with C# support)' ."
       )
