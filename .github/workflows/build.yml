@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Ruby
         uses: ruby/setup-ruby@v1
@@ -31,7 +31,7 @@ jobs:
         run: bundle exec rake godot:build_artifact VERSION=${{ github.event.inputs.godot_version }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot
           path: godot_*.deb
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Ruby
         uses: ruby/setup-ruby@v1
@@ -56,7 +56,7 @@ jobs:
         run: bundle exec rake godot-mono:build_artifact VERSION=${{ github.event.inputs.godot_version }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: godot-mono
           path: godot-mono_*.deb
@@ -68,7 +68,7 @@ jobs:
 
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
 
