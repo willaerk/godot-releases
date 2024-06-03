@@ -9,7 +9,7 @@ if (ENV['VERSION'].nil? or ENV['VERSION'].empty?)
   redirect_version_url = Net::HTTP.get_response(URI("#{releases_url}/latest/"))['Location']
   version = redirect_version_url.split('/')[-1]
 else
-  version = "#{ENV['VERSION']}-stable"
+  version = "#{ENV['VERSION']}"
 end
 
 arch             = 'x86_64'
