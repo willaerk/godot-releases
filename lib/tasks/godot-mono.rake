@@ -3,7 +3,7 @@ namespace = File.basename(File.expand_path('.', __FILE__.chomp('.rake')))
 require 'uri'
 require 'net/http'
 
-releases_url = 'https://github.com/godotengine/godot/releases'
+releases_url = 'https://github.com/godotengine/godot-builds/releases'
 
 if (ENV['VERSION'].nil? or ENV['VERSION'].empty?)
   redirect_version_url = Net::HTTP.get_response(URI("#{releases_url}/latest/"))['Location']
