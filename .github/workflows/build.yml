@@ -81,7 +81,7 @@ jobs:
 
       - if: github.event.inputs.release_artifact == 'true'
         name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         id: create_release
         with:
           name: ${{ steps.artifact.outputs.version }}
