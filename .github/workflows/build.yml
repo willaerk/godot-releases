@@ -1,3 +1,7 @@
+name: Build and release
+
+run_name: Build and release Godot version ${{ github.event.inputs.godot_version }}
+
 on:
   workflow_dispatch:
     inputs:
